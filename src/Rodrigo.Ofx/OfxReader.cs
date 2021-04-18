@@ -84,6 +84,23 @@ namespace Rodrigo.Ofx
             messages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTSTART = fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"]["DTSTART"];
             messages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTEND = fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"]["DTEND"];
 
+            foreach(var item in fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"])
+            {
+                if (item.Key == "STMTTRN")
+                {
+                    messages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions.Add(new Stmttrn()
+                    {
+                        TRNTYPE = item.Value["TRNTYPE"],
+                        DTPOSTED = item.Value["DTPOSTED"],
+                        TRNAMT = item.Value["TRNAMT"],
+                        FITID = item.Value["FITID"],
+                        CHECKNUM = item.Value["CHECKNUM"],
+                        REFNUM = item.Value["REFNUM"],
+                        MEMO = item.Value["MEMO"],
+                    });
+                }
+            }
+
 
             return messages;
         }

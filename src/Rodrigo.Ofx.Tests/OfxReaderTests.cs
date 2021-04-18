@@ -54,5 +54,23 @@ namespace Rodrigo.Ofx.Tests
             Assert.AreEqual("20210301", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTSTART);
             Assert.AreEqual("20210331", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTEND);
         }
+
+
+        [Test]
+        public void WhenParseMinimumFileMustReturnTransactionsCorrectly()
+        {
+            var reader = new OfxReader();
+            OfxModel ofx = reader.Load(TestData.BASIC);
+
+            Assert.AreEqual(1, ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions.Count);
+
+            Assert.AreEqual("PAYMENT", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].TRNTYPE);
+            Assert.AreEqual("20210305", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].DTPOSTED);
+            Assert.AreEqual("-1400.77", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].TRNAMT);
+            Assert.AreEqual("05/03/2021077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].FITID);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].CHECKNUM);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].REFNUM);
+            Assert.AreEqual("Payment", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].MEMO);
+        }
     }
 }
