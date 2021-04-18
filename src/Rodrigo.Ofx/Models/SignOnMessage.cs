@@ -7,9 +7,6 @@ namespace Rodrigo.Ofx.Models
         [OfxProperty("STATUS")]
         public Status Status { get; set; }
 
-        [OfxProperty("SEVERITY")]
-        public string Severity { get; set; }
-
         [OfxProperty("DTSERVER")]
         public string DateServer { get; set; }
 

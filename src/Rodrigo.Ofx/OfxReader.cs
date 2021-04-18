@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 using Rodrigo.Ofx.Attributes;
@@ -18,36 +19,16 @@ namespace Rodrigo.Ofx
 
             string ofxBodyContent = FileParser.GetOfxBody(fileContent);
 
+            OfxDictionary<string, object> root = XmlToDictionaryConverter.Convert(ofxBodyContent);
 
-            using (var stringReader = new StringReader(ofxBodyContent))
-            {
-                XmlReader reader = XmlReader.Create(stringReader);
+            var messages = root["OFX"]["SIGNONMSGSRSV1"]["SONRS"];
 
-                reader.MoveToContent();
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element)
-                    {
-                        if (reader.Name == "CODE")
-                            model.Ofx.SignOnMessage.Status.Code = GetXmlValue(reader);
-
-                        if (reader.Name == "SEVERITY")
-                            model.Ofx.SignOnMessage.Severity = GetXmlValue(reader);
-
-                        if (reader.Name == "DTSERVER")
-                            model.Ofx.SignOnMessage.DateServer = GetXmlValue(reader);
-
-                        if (reader.Name == "LANGUAGE")
-                            model.Ofx.SignOnMessage.Language = GetXmlValue(reader);
-
-                        if (reader.Name == "ORG")
-                            model.Ofx.SignOnMessage.Fi.Organization = GetXmlValue(reader);
-
-                        if (reader.Name == "FID")
-                            model.Ofx.SignOnMessage.Fi.Fid = GetXmlValue(reader);
-                    }
-                }
-            }
+            model.Ofx.SignOnMessage.Status.Code = messages["STATUS"]["CODE"];
+            model.Ofx.SignOnMessage.Status.Severity = messages["STATUS"]["SEVERITY"];
+            model.Ofx.SignOnMessage.DateServer = messages["DTSERVER"];
+            model.Ofx.SignOnMessage.Language = messages["LANGUAGE"];
+            model.Ofx.SignOnMessage.Fi.Organization = messages["FI"]["ORG"];
+            model.Ofx.SignOnMessage.Fi.Fid = messages["FI"]["FID"];
 
             foreach (var line in lines)
             {
