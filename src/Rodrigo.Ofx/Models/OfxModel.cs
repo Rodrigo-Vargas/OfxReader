@@ -49,5 +49,13 @@ namespace Rodrigo.Ofx.Models
 
         [OfxProperty("NEWFILEUID")]
         public string NewFileUID { get; set; }
+
+        [OfxProperty("OFX")]
+        public OfxBody Ofx { get; set; }
+
+        public OfxModel()
+        {
+            Ofx = new OfxBody();
+        }
     }
 }

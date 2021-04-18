@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.IO;
+using System.Xml;
+using System.Xml.Linq;
 using Rodrigo.Ofx.Attributes;
 using Rodrigo.Ofx.Models;
 
@@ -11,6 +13,41 @@ namespace Rodrigo.Ofx
             var model = new OfxModel();
 
             var lines = fileContent.Split("\r\n");
+
+            fileContent = string.Join("", lines);
+
+            string ofxBodyContent = FileParser.GetOfxBody(fileContent);
+
+
+            using (var stringReader = new StringReader(ofxBodyContent))
+            {
+                XmlReader reader = XmlReader.Create(stringReader);
+
+                reader.MoveToContent();
+                while (reader.Read())
+                {
+                    if (reader.NodeType == XmlNodeType.Element)
+                    {
+                        if (reader.Name == "CODE")
+                            model.Ofx.SignOnMessage.Status.Code = GetXmlValue(reader);
+
+                        if (reader.Name == "SEVERITY")
+                            model.Ofx.SignOnMessage.Severity = GetXmlValue(reader);
+
+                        if (reader.Name == "DTSERVER")
+                            model.Ofx.SignOnMessage.DateServer = GetXmlValue(reader);
+
+                        if (reader.Name == "LANGUAGE")
+                            model.Ofx.SignOnMessage.Language = GetXmlValue(reader);
+
+                        if (reader.Name == "ORG")
+                            model.Ofx.SignOnMessage.Fi.Organization = GetXmlValue(reader);
+
+                        if (reader.Name == "FID")
+                            model.Ofx.SignOnMessage.Fi.Fid = GetXmlValue(reader);
+                    }
+                }
+            }
 
             foreach (var line in lines)
             {
@@ -40,6 +77,15 @@ namespace Rodrigo.Ofx
             }
 
             return model;
+        }
+
+        private string GetXmlValue (XmlReader reader)
+        {
+            XElement element = XNode.ReadFrom(reader) as XElement;
+            if (element == null)
+                return "";
+
+            return element.Value;
         }
     }
 }

@@ -21,5 +21,20 @@ namespace Rodrigo.Ofx.Tests
             Assert.AreEqual("NONE", ofx.OldFileUID);
             Assert.AreEqual("NONE", ofx.NewFileUID);
         }
+
+        [Test]
+        public void WhenParseMinimumFileMustReturnSignOnMessageAttributesCorrectly()
+        {
+            var reader = new OfxReader();
+            OfxModel ofx = reader.Load(TestData.BASIC);
+
+            Assert.AreEqual("0", ofx.Ofx.SignOnMessage.Status.Code);
+            Assert.AreEqual("INFO", ofx.Ofx.SignOnMessage.Severity);
+            Assert.AreEqual("20210417", ofx.Ofx.SignOnMessage.DateServer);
+            Assert.AreEqual("POR", ofx.Ofx.SignOnMessage.Language);
+
+            Assert.AreEqual("Banco Inter S/A", ofx.Ofx.SignOnMessage.Fi.Organization);
+            Assert.AreEqual("077", ofx.Ofx.SignOnMessage.Fi.Fid);
+        }
     }
 }
