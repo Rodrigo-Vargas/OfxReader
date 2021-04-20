@@ -19,84 +19,93 @@ namespace Rodrigo.Ofx
 
             string ofxBodyContent = FileParser.GetOfxBody(fileContent);
 
-            OfxDictionary<string, object> root = XmlToDictionaryConverter.Convert(ofxBodyContent);
+            ofxBodyContent = "<xml>" + ofxBodyContent + "</xml>";
 
-            model.Ofx.SignOnMessage = ParseSignOnMessages(root["OFX"]["SIGNONMSGSRSV1"]["SONRS"]);
-
-            model.Ofx.BankMessages = ParseBankMessages(root["OFX"]["BANKMSGSRSV1"]);
-
-            foreach (var line in lines)
+            using (var stringReader = new StringReader(ofxBodyContent))
             {
-                string value = "";
-                string propName = "";
+                XmlReader reader = XmlReader.Create(stringReader);
+                XmlDocument doc = new XmlDocument();
+                doc.Load(reader);
 
-                foreach (var property in model.GetType().GetProperties())
+                XmlNode node = doc.DocumentElement.FirstChild;
+
+                model.Ofx.SignOnMessage = ParseSignOnMessages(node["SIGNONMSGSRSV1"]["SONRS"]);
+
+                model.Ofx.BankMessages = ParseBankMessages(node["BANKMSGSRSV1"]);
+
+                foreach (var line in lines)
                 {
-                    object[] attrs = property.GetCustomAttributes(true);
-                    foreach (object attr in attrs)
+                    string value = "";
+                    string propName = "";
+
+                    foreach (var property in model.GetType().GetProperties())
                     {
-                        OfxProperty authAttr = attr as OfxProperty;
-                        if (authAttr != null)
+                        object[] attrs = property.GetCustomAttributes(true);
+                        foreach (object attr in attrs)
                         {
-                            propName = property.Name;
-                            value = authAttr.FieldName;
+                            OfxProperty authAttr = attr as OfxProperty;
+                            if (authAttr != null)
+                            {
+                                propName = property.Name;
+                                value = authAttr.FieldName;
+                            }
+                        }
+
+                        var keyValue = line.Split(":");
+
+                        if (keyValue.Length > 1 && value == keyValue[0])
+                        {
+                            model[propName] = keyValue[1];
                         }
                     }
-
-                    var keyValue = line.Split(":");
-
-                    if (keyValue.Length > 1 && value == keyValue[0])
-                    {
-                        model[propName] = keyValue[1];
-                    }
                 }
-            }
 
+            }
             return model;
         }
 
-        private static dynamic ParseSignOnMessages(dynamic fileContent)
+        private static dynamic ParseSignOnMessages(XmlNode fileContent)
         {
             var messages = new SignOnMessage();
 
-            messages.Status.Code = fileContent["STATUS"]["CODE"];
-            messages.Status.Severity = fileContent["STATUS"]["SEVERITY"];
-            messages.DateServer = fileContent["DTSERVER"];
-            messages.Language = fileContent["LANGUAGE"];
-            messages.Fi.Organization = fileContent["FI"]["ORG"];
-            messages.Fi.Fid = fileContent["FI"]["FID"];
+            messages.Status.Code = fileContent["STATUS"]["CODE"].InnerText;
+            messages.Status.Severity = fileContent["STATUS"]["SEVERITY"].InnerText;
+            messages.DateServer = fileContent["DTSERVER"].InnerText;
+            messages.Language = fileContent["LANGUAGE"].InnerText;
+            messages.Fi.Organization = fileContent["FI"]["ORG"].InnerText;
+            messages.Fi.Fid = fileContent["FI"]["FID"].InnerText;
 
             return messages;
         }
 
-        private BankMessages ParseBankMessages(dynamic fileContent)
+        private BankMessages ParseBankMessages(XmlNode fileContent)
         {
             var messages = new BankMessages();
 
-            messages.Stmttrns.Trnuid = fileContent["STMTTRNRS"]["TRNUID"];
-            messages.Stmttrns.Status.Code = fileContent["STMTTRNRS"]["STATUS"]["CODE"];
-            messages.Stmttrns.Status.Severity = fileContent["STMTTRNRS"]["STATUS"]["SEVERITY"];
-            messages.Stmttrns.CURDEF = fileContent["STMTTRNRS"]["STMTRS"]["CURDEF"];
-            messages.Stmttrns.BANKACCTFROM.Id = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["BANKID"];
-            messages.Stmttrns.BANKACCTFROM.BranchID = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["BRANCHID"];
-            messages.Stmttrns.BANKACCTFROM.AccountID = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["ACCTID"];
-            messages.Stmttrns.BANKACCTFROM.AccountType = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["ACCTTYPE"];
-            messages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTSTART = fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"]["DTSTART"];
-            messages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTEND = fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"]["DTEND"];
+            messages.Stmttrns.Trnuid = fileContent["STMTTRNRS"]["TRNUID"].InnerText;
+            messages.Stmttrns.Status.Code = fileContent["STMTTRNRS"]["STATUS"]["CODE"].InnerText;
+            messages.Stmttrns.Status.Severity = fileContent["STMTTRNRS"]["STATUS"]["SEVERITY"].InnerText;
+            messages.Stmttrns.Currency = fileContent["STMTTRNRS"]["STMTRS"]["CURDEF"].InnerText;
+            messages.Stmttrns.AccountFrom.Id = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["BANKID"].InnerText;
+            messages.Stmttrns.AccountFrom.BranchID = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["BRANCHID"].InnerText;
+            messages.Stmttrns.AccountFrom.AccountID = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["ACCTID"].InnerText;
+            messages.Stmttrns.AccountFrom.AccountType = fileContent["STMTTRNRS"]["STMTRS"]["BANKACCTFROM"]["ACCTTYPE"].InnerText;
+            messages.Stmttrns.AccountFrom.TransacionList.StartDate = fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"]["DTSTART"].InnerText;
+            messages.Stmttrns.AccountFrom.TransacionList.EndDate = fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"]["DTEND"].InnerText;
 
-            foreach(var item in fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"])
+            foreach (XmlNode item in fileContent["STMTTRNRS"]["STMTRS"]["BANKTRANLIST"])
             {
-                if (item.Key == "STMTTRN")
+                if (item.Name == "STMTTRN")
                 {
-                    messages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions.Add(new Stmttrn()
+                    messages.Stmttrns.AccountFrom.TransacionList.Transactions.Add(new Stmttrn()
                     {
-                        TRNTYPE = item.Value["TRNTYPE"],
-                        DTPOSTED = item.Value["DTPOSTED"],
-                        TRNAMT = item.Value["TRNAMT"],
-                        FITID = item.Value["FITID"],
-                        CHECKNUM = item.Value["CHECKNUM"],
-                        REFNUM = item.Value["REFNUM"],
-                        MEMO = item.Value["MEMO"],
+                        Type = item["TRNTYPE"].InnerText,
+                        Date = item["DTPOSTED"].InnerText,
+                        Ammount = item["TRNAMT"].InnerText,
+                        FITID = item["FITID"].InnerText,
+                        CHECKNUM = item["CHECKNUM"].InnerText,
+                        REFNUM = item["REFNUM"].InnerText,
+                        MEMO = item["MEMO"].InnerText,
                     });
                 }
             }

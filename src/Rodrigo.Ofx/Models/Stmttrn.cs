@@ -2,9 +2,9 @@
 {
     public class Stmttrn
     {
-        public string TRNTYPE { get; set; }
-        public string DTPOSTED { get; set; }
-        public string TRNAMT { get; set; }
+        public string Type { get; set; }
+        public string Date { get; set; }
+        public string Ammount { get; set; }
         public string FITID { get; set; }
         public string CHECKNUM { get; set; }
         public string REFNUM { get; set; }

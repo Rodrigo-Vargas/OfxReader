@@ -5,12 +5,12 @@
         public string Id { get; set; }
         public string BranchID { get; set; }
         public string AccountID { get; set; }
-        public TransactionList BANKTRANLIST { get; set; }
+        public TransactionList TransacionList { get; set; }
         public string AccountType { get; set; }
 
         public BankAccount()
         {
-            BANKTRANLIST = new TransactionList();
+            TransacionList = new TransactionList();
         }
     }
 }

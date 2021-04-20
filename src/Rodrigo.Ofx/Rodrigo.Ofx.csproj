@@ -3,5 +3,14 @@
 		<TargetFrameworks Condition="'$(TestFrameworks)'==''">netcoreapp3.1;</TargetFrameworks>
 		<TargetFrameworks Condition="'$(TestFrameworks)'!=''">$(TestFrameworks)</TargetFrameworks>
 		<OutputType>Library</OutputType>
+		<IsPackable>true</IsPackable>
+		<Version>0.2.0</Version>
+		<Authors>Rodrigo Vargas</Authors>
+		<Company>rodrigovargas.com.br</Company>
+		<Description>A .NET OFX files parser</Description>
+		<Copyright>Copyright ₢ Rodrigo Vargas 2021</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://rodrigovargas.com.br/OfxParser</PackageProjectUrl>
+		<PackageTags>ofx</PackageTags>
 	</PropertyGroup>
 </Project>

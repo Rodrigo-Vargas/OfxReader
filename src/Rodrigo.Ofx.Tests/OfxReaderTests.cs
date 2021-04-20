@@ -46,13 +46,13 @@ namespace Rodrigo.Ofx.Tests
             Assert.AreEqual("1001", ofx.Ofx.BankMessages.Stmttrns.Trnuid);
             Assert.AreEqual("0", ofx.Ofx.BankMessages.Stmttrns.Status.Code);
             Assert.AreEqual("INFO", ofx.Ofx.BankMessages.Stmttrns.Status.Severity);
-            Assert.AreEqual("BRL", ofx.Ofx.BankMessages.Stmttrns.CURDEF);
-            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.Id);
-            Assert.AreEqual("XXXX-X", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BranchID);
-            Assert.AreEqual("12345678", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.AccountID);
-            Assert.AreEqual("CHECKING", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.AccountType);
-            Assert.AreEqual("20210301", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTSTART);
-            Assert.AreEqual("20210331", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.DTEND);
+            Assert.AreEqual("BRL", ofx.Ofx.BankMessages.Stmttrns.Currency);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.Id);
+            Assert.AreEqual("XXXX-X", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.BranchID);
+            Assert.AreEqual("12345678", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.AccountID);
+            Assert.AreEqual("CHECKING", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.AccountType);
+            Assert.AreEqual("20210301", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.StartDate);
+            Assert.AreEqual("20210331", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.EndDate);
         }
 
 
@@ -62,15 +62,32 @@ namespace Rodrigo.Ofx.Tests
             var reader = new OfxReader();
             OfxModel ofx = reader.Load(TestData.BASIC);
 
-            Assert.AreEqual(1, ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions.Count);
+            Assert.AreEqual(1, ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions.Count);
 
-            Assert.AreEqual("PAYMENT", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].TRNTYPE);
-            Assert.AreEqual("20210305", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].DTPOSTED);
-            Assert.AreEqual("-1400.77", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].TRNAMT);
-            Assert.AreEqual("05/03/2021077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].FITID);
-            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].CHECKNUM);
-            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].REFNUM);
-            Assert.AreEqual("Payment", ofx.Ofx.BankMessages.Stmttrns.BANKACCTFROM.BANKTRANLIST.Transactions[0].MEMO);
+            Assert.AreEqual("PAYMENT", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].Type);
+            Assert.AreEqual("20210305", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].Date);
+            Assert.AreEqual("-1400.77", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].Ammount);
+            Assert.AreEqual("05/03/2021077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].FITID);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].CHECKNUM);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].REFNUM);
+            Assert.AreEqual("Payment", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].MEMO);
+        }
+
+        [Test]
+        public void WhenParseMinimumFileWithTwoTransactionsMustParseCorrectly()
+        {
+            var reader = new OfxReader();
+            OfxModel ofx = reader.Load(TestData.BASIC_TWO_TRANSACTIONS);
+
+            Assert.AreEqual(2, ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions.Count);
+
+            Assert.AreEqual("PAYMENT", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].Type);
+            Assert.AreEqual("20210305", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].Date);
+            Assert.AreEqual("-1400.77", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].Ammount);
+            Assert.AreEqual("05/03/2021077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].FITID);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].CHECKNUM);
+            Assert.AreEqual("077", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].REFNUM);
+            Assert.AreEqual("Payment", ofx.Ofx.BankMessages.Stmttrns.AccountFrom.TransacionList.Transactions[0].MEMO);
         }
     }
 }

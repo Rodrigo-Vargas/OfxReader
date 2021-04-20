@@ -4,13 +4,13 @@
     {
         public string Trnuid { get; set; }
         public Status Status { get; set; }
-        public string CURDEF { get; set; }
-        public BankAccount BANKACCTFROM { get; set; }
+        public string Currency { get; set; }
+        public BankAccount AccountFrom { get; set; }
 
         public Stmttrns()
         {
             Status = new Status();
-            BANKACCTFROM = new BankAccount();
+            AccountFrom = new BankAccount();
         }
     }
 }

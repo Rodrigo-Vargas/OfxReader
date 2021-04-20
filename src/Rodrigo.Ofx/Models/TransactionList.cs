@@ -4,8 +4,8 @@ namespace Rodrigo.Ofx.Models
 {
     public class TransactionList
     {
-        public string DTSTART { get; set; }
-        public string DTEND { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
         public List<Stmttrn> Transactions { get; set; }
 
         public TransactionList()
